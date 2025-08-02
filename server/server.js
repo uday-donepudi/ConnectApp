@@ -12,26 +12,39 @@ const __dirname = path.resolve();
 
 const app = express();
 
-
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:3000",
-    credentials: true, 
+    credentials: true,
   })
 );
-app.use(cookieParser()); 
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-
-
 
 app.use("/api/users", usersRoutes);
 app.use("/api/posts", postsRoutes);
 
+// Serve frontend in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../client/dist")));
+}
+
 // Basic route
 app.get("/", (req, res) => {
-  res.json({ message: "ConnectSphere API is running!" });
+  if (process.env.NODE_ENV === "production") {
+    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  } else {
+    res.json({ message: "ConnectSphere API is running!" });
+  }
 });
+
+// Catch-all handler for frontend routes in production
+if (process.env.NODE_ENV === "production") {
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
+  });
+}
 
 // Error handler
 app.use((err, req, res, next) => {
@@ -39,18 +52,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Something went wrong!" });
 });
 
-// 404 handler
+// 404 handler (only for API routes in production)
 app.use("*", (req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
-
-if(process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-  
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../client/dist", "index.html"));
-  });
-}
 
 const PORT = process.env.PORT || 5000;
 
