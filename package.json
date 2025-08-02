@@ -4,10 +4,8 @@
   "description": "A modern, full-stack professional community platform built with React.js, Node.js, Express, MongoDB, and Vite.",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix client && npm run build --prefix client",
-    "start": "npm run start --prefix server",
-    "install-client": "npm install --prefix client",
-    "install-server": "npm install --prefix server"
+    "build": "npm install --prefix server && npm install --prefix client && npm run build --prefix client",
+    "start": "npm run start --prefix server"
   },
   "keywords": [],
   "author": "",
