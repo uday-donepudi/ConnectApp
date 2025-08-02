@@ -22,13 +22,18 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Serve frontend in production (before API routes)
+if (process.env.NODE_ENV === "production") {
+  app.use(
+    express.static(path.join(__dirname, "../client/dist"), {
+      maxAge: "1d", // Cache static assets for 1 day
+      etag: false,
+    })
+  );
+}
+
 app.use("/api/users", usersRoutes);
 app.use("/api/posts", postsRoutes);
-
-// Serve frontend in production
-if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../client/dist")));
-}
 
 // Basic route
 app.get("/", (req, res) => {
